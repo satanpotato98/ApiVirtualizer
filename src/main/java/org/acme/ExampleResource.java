@@ -2,6 +2,7 @@ package org.acme;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.acme.entity.Api;
 import org.acme.entity.Product;
@@ -28,6 +29,7 @@ public class ExampleResource {
 	
     @POST
     @Path("/1")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response jsonKeys(Product product) throws IOException {
     	
     	return excelWriter.requestWriter(product);
@@ -39,8 +41,14 @@ public class ExampleResource {
     @Path("/2")
     public List xmlKeys(Product product) throws IOException {
     	
-    	JsonObject jsonObject=XmlStringToJson.convertXmlStringToJson(product.getApiList().get(0).getResponseBody().get(0));
-    	List keys=JsonKeyFinder.getAllKeys(jsonObject);
+    	JsonObject jsonObject=JsonStringtoObject.JsonStringtoObject(product.getApiList().get(0).getRequestBody());
+    	List keys=JsonKeyFinder.gatherKeys(jsonObject);
     	return keys;
+    }
+    
+    @POST
+    @Path("/3")
+    public Map convertStringToMap(Product product) {
+    	return org.acme.utilities.convertStringToMap.transformToMap(product.getApiList().get(0).getRequestBody());
     }
 }

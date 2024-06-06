@@ -12,6 +12,10 @@ import org.acme.utilities.Identifier;
 import org.acme.utilities.JsonKeyFinder;
 import org.acme.utilities.JsonStringtoObject;
 import org.acme.utilities.XmlStringToJson;
+import org.acme.writer.ConfigWriter;
+import org.acme.writer.RequestWriter;
+import org.acme.writer.ResponseWriter;
+import org.acme.writer.TransformWriter;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -25,48 +29,15 @@ public class ExcelWriter {
 	public Response requestWriter(Product product) throws IOException {
 		String productName=product.getProductName();
 		List<Api> apiList=product.getApiList();
-		JsonObject requestJson = null;
-		FileInputStream fileInputStream = new FileInputStream("Resources/ExcelTemplate.xlsx");
+		
+		FileInputStream fileInputStream = new FileInputStream("Resources/template.xlsx");
 		Workbook workbook = new XSSFWorkbook(fileInputStream);
-        Sheet sheet = workbook.getSheet("Request");
-		for(Api api: apiList) {
-			
-			if(Identifier.identifyContent(api.getRequestBody()).equalsIgnoreCase("json")) {
-				requestJson=JsonStringtoObject.JsonStringtoObject(api.getRequestBody());
-			}
-			else if(Identifier.identifyContent(api.getRequestBody()).equalsIgnoreCase("xml")) {
-				try {
-					requestJson=XmlStringToJson.convertXmlStringToJson(api.getRequestBody());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			List<List<String>> requestKeys=JsonKeyFinder.getAllKeys(requestJson);
-			
-			
-	       
-	 
-	        for(List<String> structure:requestKeys) {
-	        	int rowCount = sheet.getLastRowNum();
-		        Row row = sheet.createRow(++rowCount);
-		        int colCount=0;
-	        	Cell productNameCell=row.createCell(colCount++);
-	        	productNameCell.setCellValue(productName);
-	        	Cell apiNameCell=row.createCell(colCount++);
-	        	apiNameCell.setCellValue(api.getApiName());
-	        	Cell keyCell=row.createCell(colCount++);
-	        	keyCell.setCellValue(structure.get(structure.size()-1));
-	        	Cell structureCell=row.createCell(colCount++);
-	        	structureCell.setCellValue(structure.toString());
-	        	
-	        }
-			
-	        
-	        
-	        
-			           
-        }
+        
+		RequestWriter.reuqestWriter(workbook, product);
+	    ResponseWriter.responseWriter(workbook, product);
+	    TransformWriter.transformWriter(workbook, product);
+	    ConfigWriter.configWriter(workbook, product);
+	
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
 		workbook.close();

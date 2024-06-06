@@ -9,6 +9,6 @@ public class Identifier {
 		else if(input.charAt(0)=='{') {
 			return "json";
 		}
-		return "undefined";
+		return "String";
 	}
 }

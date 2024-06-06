@@ -74,8 +74,6 @@
     <version>5.2.3</version> <!-- Or the latest version -->
 </dependency>
 
-
-
     </dependencies>
 
     <build>
