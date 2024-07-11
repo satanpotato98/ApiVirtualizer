@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.acme.entity.Api;
@@ -27,20 +28,24 @@ import jakarta.ws.rs.core.Response;
 public class ExcelWriter {
 	
 	public Response requestWriter(Product product) throws IOException {
-		String productName=product.getProductName();
-		List<Api> apiList=product.getApiList();
-		
-		FileInputStream fileInputStream = new FileInputStream("Resources/template.xlsx");
-		Workbook workbook = new XSSFWorkbook(fileInputStream);
-        
-		RequestWriter.reuqestWriter(workbook, product);
-	    ResponseWriter.responseWriter(workbook, product);
-	    TransformWriter.transformWriter(workbook, product);
-	    ConfigWriter.configWriter(workbook, product);
-	
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        String productName = product.getProductName();
+        List<Api> apiList = product.getApiList();
+
+        // Load the template from the classpath
+        InputStream fileInputStream = getClass().getResourceAsStream("/resources/template.xlsx");
+        if (fileInputStream == null) {
+            throw new IOException("Template file not found in resources");
+        }
+        Workbook workbook = new XSSFWorkbook(fileInputStream);
+
+        RequestWriter.reuqestWriter(workbook, product);
+        ResponseWriter.responseWriter(workbook, product);
+        TransformWriter.transformWriter(workbook, product);
+        ConfigWriter.configWriter(workbook, product);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
-		workbook.close();
+        workbook.close();
         fileInputStream.close();
         byte[] excelBytes = outputStream.toByteArray();
 
@@ -48,6 +53,6 @@ public class ExcelWriter {
         return Response.ok(excelBytes)
                 .header("Content-Disposition", "attachment; filename=\"ApiVirtualizer.xlsx\"")
                 .build();
-			 }
+    }
 }
 	

@@ -25,15 +25,16 @@ public class ResponseWriter {
 		Sheet sheet = workbook.getSheet("Response");
 		JsonObject responseJson = null;
 		for(Api api: apiList) {
-			
+			int responseIndex=-1;
 			List<String> responses=api.getResponseBody();
 			for(String response:responses) {
+				responseIndex++;
 				if(Identifier.identifyContent(response).equalsIgnoreCase("json")) {
 					responseJson=JsonStringtoObject.JsonStringtoObject(response);
 				}
 				else if(Identifier.identifyContent(response).equalsIgnoreCase("xml")) {
 					try {
-						responseJson=XmlStringToJson.convertXmlStringToJson(api.getResponseBody().get(0));
+						responseJson=XmlStringToJson.convertXmlStringToJson(response);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -47,6 +48,8 @@ public class ResponseWriter {
 	        	int rowCount = sheet.getLastRowNum();
 		        Row row = sheet.createRow(++rowCount);
 		        int colCount=0;
+		        Cell index=row.createCell(colCount++);
+		        index.setCellValue(responseIndex);
 	        	Cell productNameCell=row.createCell(colCount++);
 	        	productNameCell.setCellValue(productName);
 	        	Cell apiNameCell=row.createCell(colCount++);
@@ -56,6 +59,7 @@ public class ResponseWriter {
 	        	keyCell.setCellValue(x[x.length-1]);
 	        	Cell structureCell=row.createCell(colCount++);
 	        	structureCell.setCellValue(structure.toString());
+	        	
 			}
 			}
 		}
