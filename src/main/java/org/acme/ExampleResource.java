@@ -2,10 +2,12 @@ package org.acme;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.acme.entity.Api;
 import org.acme.entity.Product;
 import org.acme.service.ExcelWriter;
+import org.acme.service.RawDataToExcel;
 import org.acme.utilities.JsonKeyFinder;
 import org.acme.utilities.JsonStringtoObject;
 import org.acme.utilities.XmlStringToJson;
@@ -43,4 +45,15 @@ public class ExampleResource {
     	List keys=JsonKeyFinder.getAllKeys(jsonObject);
     	return keys;
     }
+
+    @POST
+    @Path("/3")
+    public Map rawDatatoExcel(Product product) throws IOException {
+
+        return RawDataToExcel.rawDataToMap();
+    	
+    	
+    	
+    }
+    
 }
