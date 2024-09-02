@@ -1,26 +1,22 @@
 package org.acme;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import org.acme.entity.Api;
-import org.acme.entity.Product;
-import org.acme.service.ExcelWriter;
-import org.acme.service.RawDataToExcel;
-import org.acme.utilities.JsonKeyFinder;
-import org.acme.utilities.JsonStringtoObject;
-import org.acme.utilities.XmlStringToJson;
-import org.apache.poi.ss.usermodel.Workbook;
-
 import jakarta.inject.Inject;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.acme.entity.Product;
+import org.acme.service.ExcelWriter;
+import org.acme.service.RawDataToExcel;
+import org.acme.utilities.JsonKeyFinder;
+import org.acme.utilities.XmlStringToJson;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Path("/api")
 public class ExampleResource {
@@ -46,11 +42,37 @@ public class ExampleResource {
     	return keys;
     }
 
-    @POST
+    @GET
     @Path("/3")
-    public Map rawDatatoExcel(Product product) throws IOException {
+    public Response rawDatatoExcel() throws IOException {
 
-        return RawDataToExcel.rawDataToMap();
+        List<Map<String, Object>> list = Arrays.asList(
+                new HashMap<>() {{
+                    put("menu", new HashMap<String, Object>() {{
+                        put("id", "file111");
+                        put("value", "File222");
+
+                        put("popup", new HashMap<String, Object>() {{
+                            put("menuitem", Arrays.asList(
+                                    new HashMap<String, Object>() {{
+                                        put("value", "New");
+                                        put("onclick", "CreateNewDoc()");
+                                    }},
+                                    new HashMap<String, Object>() {{
+                                        put("value", "Open");
+                                        put("onclick", "OpenDoc()");
+                                    }},
+                                    new HashMap<String, Object>() {{
+                                        put("value", "Close");
+                                        put("onclick", "CloseDoc()");
+                                    }}
+                            ));
+                        }});
+                    }});
+                }}
+        );
+
+        return RawDataToExcel.rawDataToMap(list);
     	
     	
     	
